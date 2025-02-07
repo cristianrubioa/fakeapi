@@ -1,0 +1,25 @@
+# 🐍 Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 🔹 Virtual environments
+venv/
+.venv/
+env/
+
+# ⚙️ IDE/editor settings
+.vscode/
+.idea/
+*.iml
+
+# 📝 Operating system files
+.DS_Store
+Thumbs.db
+
+# 🚀 Execution and logs
+*.log
+*.out
+*.pid
+*.gz
+*.sqlite
