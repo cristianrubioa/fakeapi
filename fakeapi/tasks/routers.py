@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from fakeapi.tasks.data import tasks_db
 from fakeapi.tasks.models import TaskModel
+from fakeapi.tasks.provider import tasks_db
 
 router = APIRouter()
 
