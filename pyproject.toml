@@ -23,3 +23,11 @@ ipdb = "^0.13.13"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+force_single_line = true
+
+[tool.black]
+line-length = 119 
+target-version = ["py312"]
+skip-string-normalization = true
