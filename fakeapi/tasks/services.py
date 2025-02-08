@@ -1,9 +1,9 @@
-
 from fakeapi.tasks.exceptions import ResourceNotFound
-from fakeapi.tasks.provider import tasks_db
 from fakeapi.tasks.models import TaskCreateModel
 from fakeapi.tasks.models import TaskResponseModel
 from fakeapi.tasks.models import TaskUpdateModel
+from fakeapi.tasks.provider import tasks_db
+
 
 def get_tasks_list() -> list[TaskResponseModel]:
     return [TaskResponseModel(**task) for task in tasks_db]
