@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: fakeapi
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: "pip install poetry && poetry install"
+    startCommand: "poetry run fastapi dev fakeapi/main.py"
+    envVars:
+      - key: PORT
+        value: 8000
