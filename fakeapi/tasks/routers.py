@@ -7,6 +7,7 @@ from fastapi import status
 from fakeapi.common.decorators import filter
 from fakeapi.common.decorators import paginate
 from fakeapi.common.decorators import sort
+from fakeapi.common.pagination import PaginationPreset
 from fakeapi.tasks import services
 from fakeapi.tasks.models import TaskCreateModel
 from fakeapi.tasks.models import TaskResponseModel
@@ -21,9 +22,9 @@ async def create_task_route(new_task: TaskCreateModel) -> TaskResponseModel:
 
 
 @router.get("/", response_model=dict[str, Any])
-@sort(ordering_fields={"id", "title", "description", "status", "created_at"})
+@paginate(PaginationPreset.STANDARD)
 @filter(filtering_fields={"id", "title", "description", "status", "created_at"})
-@paginate()
+@sort(ordering_fields={"id", "title", "description", "status", "created_at"})
 async def get_tasks(request: Request) -> dict[str, Any]:
     del request
     return services.get_tasks_list()

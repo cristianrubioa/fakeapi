@@ -8,6 +8,7 @@ from typing import Union
 from fastapi import Request
 
 from fakeapi.common import enums
+from fakeapi.common.pagination import PaginatorConfig
 
 F = TypeVar("F", bound=Callable[..., Awaitable[list[Any]]])
 
@@ -65,15 +66,15 @@ def filter(filtering_fields: set[str]) -> Callable[[F], F]:
     return decorator
 
 
-def paginate(default_page_size: int = 30, max_page_size: int = 100) -> Callable[[F], F]:
+def paginate(config: PaginatorConfig) -> Callable[[F], F]:
     def decorator(func: F) -> F:
         @wraps(func)
         async def wrapper(request: Request, *args: Any, **kwargs: Any) -> dict[str, Union[int, None, list[Any]]]:
             data_list = await func(request, *args, **kwargs)
 
             page = int(request.query_params.get(enums.QueryParam.PAGE.value, 1))
-            page_size = int(request.query_params.get(enums.QueryParam.PAGE_SIZE.value, default_page_size))
-            page_size = min(page_size, max_page_size)
+            page_size = int(request.query_params.get(enums.QueryParam.PAGE_SIZE.value, config.default_page_size))
+            page_size = min(page_size, config.max_page_size)
 
             total_items = len(data_list)
             start_index = (page - 1) * page_size
