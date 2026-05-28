@@ -23,3 +23,9 @@ Thumbs.db
 *.pid
 *.gz
 *.sqlite
+
+# OpenSpec
+openspec/
+
+# Claude Code
+.claude/
