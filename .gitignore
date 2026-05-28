@@ -20,6 +20,9 @@ Thumbs.db
 # Environment
 .env
 
+# Coverage
+.coverage
+
 # 🚀 Execution and logs
 *.log
 *.out

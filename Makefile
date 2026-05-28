@@ -36,7 +36,7 @@ update:
 
 # 🔥 Run smoke tests against a live URL
 smoke:
-	poetry run pytest smoke/ -v
+	poetry run pytest fakeapi/smoke/ -v
 
 # 📌 Help
 help:
