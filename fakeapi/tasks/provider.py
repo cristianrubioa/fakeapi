@@ -122,13 +122,18 @@ class TaskProvider(BaseProvider):
 fake = Faker()
 fake.add_provider(TaskProvider)
 
-tasks_db = [
+tasks_seed: list[dict] = [
     {
         "id": i,
         "title": fake.get_task_title(i - 1),
         "description": fake.get_task_description(i - 1),
         "status": fake.get_task_status(i),
         "created_at": fake.get_task_created_at(i),
+        "user_id": ((i - 1) % 10) + 1,
+        "project_id": ((i - 1) // 3) + 1,
     }
     for i in range(1, len(TaskProvider.titles) + 1)
 ]
+
+# Backward-compat alias — services no longer use this directly
+tasks_db = tasks_seed

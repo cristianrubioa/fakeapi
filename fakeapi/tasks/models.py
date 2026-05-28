@@ -20,6 +20,8 @@ class TaskBaseModel(BaseModel):
         max_length=settings.DESCRIPTION_LIMITS["max"],
     )
     status: TaskStatus = Field(default=TaskStatus.PENDING)
+    user_id: Optional[int] = None
+    project_id: Optional[int] = None
 
 
 class TaskCreateModel(TaskBaseModel):
@@ -38,6 +40,8 @@ class TaskUpdateModel(TaskBaseModel):
         max_length=settings.DESCRIPTION_LIMITS["max"],
     )
     status: Optional[TaskStatus] = None
+    user_id: Optional[int] = None
+    project_id: Optional[int] = None
 
 
 class TaskResponseModel(TaskBaseModel):
