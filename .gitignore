@@ -17,6 +17,9 @@ env/
 .DS_Store
 Thumbs.db
 
+# Environment
+.env
+
 # 🚀 Execution and logs
 *.log
 *.out

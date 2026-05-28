@@ -32,6 +32,10 @@ run:
 update:
 	poetry update
 
+# 🔥 Run smoke tests against a live URL
+smoke:
+	poetry run pytest smoke/ -v
+
 # 📌 Help
 help:
 	@echo "Available commands:"
@@ -42,3 +46,4 @@ help:
 	@echo "  check        Run format, linting, and tests"
 	@echo "  run          Start uvicorn dev server with auto-reload"
 	@echo "  update       Update all Poetry-managed dependencies"
+	@echo "  smoke        Run smoke tests (requires SMOKE_BASE_URL in .env)"
