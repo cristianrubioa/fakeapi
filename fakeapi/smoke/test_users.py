@@ -40,7 +40,7 @@ def test_get_user_not_found(base_url, workspace_id):
     # Action
     response = httpx.get(f"{base_url}/ws/{workspace_id}/users/999999")
     # Expected
-    expected = {"detail": "Resource not found."}
+    expected = {"detail": "User not found."}
     assert response.status_code == 404
     assert response.json() == expected
 

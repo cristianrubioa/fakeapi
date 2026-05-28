@@ -40,7 +40,7 @@ def test_get_project_not_found(base_url, workspace_id):
     # Action
     response = httpx.get(f"{base_url}/ws/{workspace_id}/projects/999999")
     # Expected
-    expected = {"detail": "Resource not found."}
+    expected = {"detail": "Project not found."}
     assert response.status_code == 404
     assert response.json() == expected
 
