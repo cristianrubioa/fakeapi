@@ -1,0 +1,262 @@
+{
+  "info": {
+    "name": "FakeAPI",
+    "description": "REST API for testing and prototyping. Create a workspace first, then use its ID for all resource requests.\n\nSet `base_url` in your Postman environment (e.g. https://fakeapi-kynw.onrender.com).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://fakeapi-kynw.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "workspace_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Workspaces",
+      "item": [
+        {
+          "name": "Create workspace",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/workspaces/",
+            "description": "Creates an isolated workspace pre-loaded with seed data. Copy the returned `id` into the `workspace_id` variable."
+          }
+        },
+        {
+          "name": "Get workspace",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/workspaces/{{workspace_id}}"
+          }
+        },
+        {
+          "name": "Extend workspace TTL",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/workspaces/{{workspace_id}}/extend"
+          }
+        },
+        {
+          "name": "Reset workspace",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/workspaces/{{workspace_id}}/reset",
+            "description": "Resets all resources in the workspace back to seed data."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "List tasks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/ws/{{workspace_id}}/tasks/",
+              "host": ["{{base_url}}"],
+              "path": ["ws", "{{workspace_id}}", "tasks", ""],
+              "query": [
+                { "key": "status", "value": "pending", "disabled": true },
+                { "key": "sort_by", "value": "-created_at", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "page_size", "value": "10", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get task",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/ws/{{workspace_id}}/tasks/1"
+          }
+        },
+        {
+          "name": "Create task",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/ws/{{workspace_id}}/tasks/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My new task\",\n  \"description\": \"A detailed description\",\n  \"status\": \"pending\",\n  \"user_id\": 1,\n  \"project_id\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Patch task",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/ws/{{workspace_id}}/tasks/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Replace task",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/ws/{{workspace_id}}/tasks/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated title\",\n  \"description\": \"Updated description\",\n  \"status\": \"completed\",\n  \"user_id\": null,\n  \"project_id\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete task",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/ws/{{workspace_id}}/tasks/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/ws/{{workspace_id}}/users/",
+              "host": ["{{base_url}}"],
+              "path": ["ws", "{{workspace_id}}", "users", ""],
+              "query": [
+                { "key": "role", "value": "admin", "disabled": true },
+                { "key": "sort_by", "value": "name", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "page_size", "value": "10", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get user",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/ws/{{workspace_id}}/users/1"
+          }
+        },
+        {
+          "name": "Get user tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/ws/{{workspace_id}}/users/1/tasks"
+          }
+        },
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/ws/{{workspace_id}}/users/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"role\": \"member\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Patch user",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/ws/{{workspace_id}}/users/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/ws/{{workspace_id}}/users/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "List projects",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/ws/{{workspace_id}}/projects/",
+              "host": ["{{base_url}}"],
+              "path": ["ws", "{{workspace_id}}", "projects", ""],
+              "query": [
+                { "key": "status", "value": "active", "disabled": true },
+                { "key": "sort_by", "value": "-created_at", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "page_size", "value": "10", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get project",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/ws/{{workspace_id}}/projects/1"
+          }
+        },
+        {
+          "name": "Get project tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/ws/{{workspace_id}}/projects/1/tasks"
+          }
+        },
+        {
+          "name": "Create project",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/ws/{{workspace_id}}/projects/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Project\",\n  \"description\": \"A project description\",\n  \"status\": \"active\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Patch project",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/ws/{{workspace_id}}/projects/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"on_hold\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete project",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/ws/{{workspace_id}}/projects/1"
+          }
+        }
+      ]
+    }
+  ]
+}
