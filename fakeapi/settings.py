@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     class Config:
         env_prefix = "FakeAPI_"
         env_file = ".env"
-        extra = "forbid"
+        extra = "ignore"
 
 
 @lru_cache

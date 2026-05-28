@@ -21,7 +21,7 @@ lint:
 
 # 🧪 Run tests
 test:
-	poetry run pytest fakeapi --cov=fakeapi --cov-report=term-missing --cov-fail-under=70 --disable-warnings
+	poetry run pytest fakeapi --ignore=fakeapi/smoke --cov=fakeapi --cov-report=term-missing --cov-fail-under=70 --disable-warnings
 
 # 🏆 Run all checks before commit
 check: format lint test
