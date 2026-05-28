@@ -28,7 +28,11 @@ def sort(ordering_fields: set[str]) -> Callable[[F], F]:
                 field = sort_by.lstrip("-")
                 if field in ordering_fields:
                     try:
-                        data_list = sorted(data_list, key=lambda x: getattr(x, field, None), reverse=reverse)
+                        data_list = sorted(
+                            data_list,
+                            key=lambda x: getattr(x, field, None),
+                            reverse=reverse,
+                        )
                     except TypeError:
                         pass
 
