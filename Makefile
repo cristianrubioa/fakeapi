@@ -24,6 +24,14 @@ test:
 # 🏆 Run all checks before commit
 check: format lint test
 
+# 🚀 Run dev server
+run:
+	poetry run uvicorn fakeapi.main:app --reload
+
+# 📦 Update dependencies
+update:
+	poetry update
+
 # 📌 Help
 help:
 	@echo "Available commands:"
@@ -32,3 +40,5 @@ help:
 	@echo "  lint         Run ruff linter"
 	@echo "  test         Run pytest"
 	@echo "  check        Run format, linting, and tests"
+	@echo "  run          Start uvicorn dev server with auto-reload"
+	@echo "  update       Update all Poetry-managed dependencies"
