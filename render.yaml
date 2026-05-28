@@ -1,11 +1,20 @@
+# Legacy v1 demo — kept for backward compatibility only.
+# Production: fakeapi.crubio.fyi via Cloudflare tunnel on dedicated server.
+#
+# To run locally:
+#   poetry install && poetry run uvicorn fakeapi.main:app --reload
+#
+# To run on dedicated server:
+#   poetry run uvicorn fakeapi.main:app --host 0.0.0.0 --port 8000
+#   Then expose via: cloudflared tunnel run fakeapi
 services:
   - type: web
-    name: fakeapi
+    name: fakeapi-legacy
     env: python
     plan: free
     region: oregon
     buildCommand: "pip install poetry && poetry install"
-    startCommand: "poetry run uvicorn fakeapi.main:app --host 0.0.0.0 --port $PORT --reload"
+    startCommand: "poetry run uvicorn fakeapi.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PORT
         value: 8000
