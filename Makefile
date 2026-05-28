@@ -4,6 +4,8 @@ SHELL := /bin/bash
 # Define source directory
 SRC := fakeapi
 
+.PHONY: install format lint test check run update smoke help
+
 # 🐍 Install dependencies
 install:
 	poetry install
