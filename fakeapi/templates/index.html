@@ -504,17 +504,17 @@
         </div>
       </div>
       <div class="terminal-body">
-        <div id="initialCmd">
+        <div id="initialCmd" style="display:none">
           <span class="prompt">$</span>
           <span class="cmd"> curl -X POST {{ base_url }}/api/workspaces/</span>
         </div>
-        <div id="terminalOutput">
+        <div id="terminalOutput" style="display:none">
           <span class="cursor"></span>
         </div>
         <div id="tabSection" style="display:none">
           <div id="tabOutput"></div>
         </div>
-        <div id="createHintBar" class="run-hint-bar">
+        <div id="createHintBar" class="run-hint-bar" style="display:none">
           <span class="run-hint-text">press &#8629; or click</span>
           <button class="run-btn" id="createBtn">Create &#9654;</button>
         </div>
@@ -679,7 +679,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ workspaces: workspaces, activeWsIdx: activeWsIdx }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ workspaces: workspaces, activeWsIdx: activeWsIdx, activeTab: activeTab }));
       } catch (_) {}
     }
 
@@ -691,6 +691,7 @@
         if (!saved.workspaces || !saved.workspaces.length) return false;
         workspaces = saved.workspaces;
         activeWsIdx = saved.activeWsIdx || 0;
+        activeTab = saved.activeTab || 'tasks';
         return true;
       } catch (_) {
         return false;
@@ -860,7 +861,7 @@
     // ── Tab clicks ─────────────────────────────────────────────
     tabGroup.addEventListener('click', function (e) {
       var btn = e.target.closest('.tab-btn');
-      if (btn && currentWsId()) showTabCommand(btn.dataset.tab);
+      if (btn && currentWsId()) { showTabCommand(btn.dataset.tab); saveState(); }
     });
 
     // ── Enter to run ───────────────────────────────────────────
@@ -959,6 +960,9 @@
       await loadCounter();
       if (wsCount === 0) {
         localStorage.removeItem(STORAGE_KEY);
+        initialCmd.style.display = '';
+        termOutput.style.display = '';
+        createHintBar.style.display = '';
         updateCounter();
       } else if (loadState()) {
         restoreUI();
