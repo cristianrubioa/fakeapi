@@ -35,7 +35,7 @@ async def lifespan(app: FastAPI):
     task.cancel()
 
 
-app = FastAPI(title="FakeAPI", version="2.0.0", lifespan=lifespan)
+app = FastAPI(title="FakeAPI", version="2.0.0", lifespan=lifespan, swagger_ui_parameters={"deepLinking": False})
 app.state.limiter = limiter
 
 
