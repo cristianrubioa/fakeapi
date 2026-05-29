@@ -2,6 +2,8 @@
 
 A REST API for testing and prototyping — real in-memory CRUD that persists within an isolated workspace session. No database, no auth.
 
+![FakeAPI](docs/screenshot.png)
+
 ## Stack
 
 | | |
@@ -15,13 +17,13 @@ A REST API for testing and prototyping — real in-memory CRUD that persists wit
 
 ```bash
 # Create a workspace — isolated copy of all seed data
-curl -X POST https://fakeapi.crubio.fyi/workspaces/
+curl -X POST https://fakeapi-kynw.onrender.com/api/workspaces/
 
 # Use it
-curl https://fakeapi.crubio.fyi/ws/{id}/tasks/?status=pending&sort_by=-created_at
+curl https://fakeapi-kynw.onrender.com/api/workspaces/{id}/tasks/?status=pending&sort_by=-created_at
 
 # Reset to seed state any time
-curl -X POST https://fakeapi.crubio.fyi/ws/{id}/reset
+curl -X POST https://fakeapi-kynw.onrender.com/api/workspaces/{id}/reset
 ```
 
 Interactive docs at `/docs`.
@@ -32,11 +34,11 @@ Each workspace comes pre-loaded with seed data and supports full CRUD, filtering
 
 | Resource | Endpoint | Seed |
 |---|---|---|
-| Tasks | `/ws/{id}/tasks/` | 30 records |
-| Users | `/ws/{id}/users/` | 10 records |
-| Projects | `/ws/{id}/projects/` | 10 records |
+| Tasks | `/api/workspaces/{id}/tasks/` | 30 records |
+| Users | `/api/workspaces/{id}/users/` | 10 records |
+| Projects | `/api/workspaces/{id}/projects/` | 10 records |
 
-Nested routes: `GET /ws/{id}/users/{user_id}/tasks` · `GET /ws/{id}/projects/{project_id}/tasks`
+Nested routes: `GET /api/workspaces/{id}/users/{user_id}/tasks` · `GET /api/workspaces/{id}/projects/{project_id}/tasks`
 
 ## Limits (free plan)
 
@@ -49,18 +51,21 @@ Nested routes: `GET /ws/{id}/users/{user_id}/tasks` · `GET /ws/{id}/projects/{p
 
 ## Live
 
-**[https://fakeapi.crubio.fyi](https://fakeapi.crubio.fyi)** — dedicated server via Cloudflare tunnel, always on.
+| | |
+|---|---|
+| **Render** | [https://fakeapi-kynw.onrender.com](https://fakeapi-kynw.onrender.com) — free tier, always available. First request may take ~1 min to wake the server. |
+| **Personal** | [https://fakeapi.crubio.fyi](https://fakeapi.crubio.fyi) — runs from my machine via a Cloudflare tunnel. May be offline. Use Render if this doesn't respond. |
 
 ## Smoke tests
 
 Contract validation against a live deployment:
 
 ```bash
-cp .env.example .env        # set SMOKE_BASE_URL to the target deployment
+cp .env.example .env        # set FakeAPI_BASE_URL to the target deployment
 make smoke
 ```
 
-`SMOKE_BASE_URL` can also be passed inline: `SMOKE_BASE_URL=http://localhost:8000 make smoke`.
+`FakeAPI_BASE_URL` can also be passed inline: `FakeAPI_BASE_URL=http://localhost:8000 make smoke`.
 
 Postman collection with pre-loaded examples: [docs/postman_collection.json](docs/postman_collection.json).
 

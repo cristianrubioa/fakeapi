@@ -12,12 +12,12 @@ flowchart TD
 
         subgraph R["Routers"]
             ROOT["GET /"]
-            ADMIN["GET /admin/stats"]
-            WS["POST · GET /workspaces/"]
-            WSA["GET · extend · reset /workspaces/{id}"]
-            TASKS["/ws/{id}/tasks — full CRUD"]
-            USERS["/ws/{id}/users — full CRUD"]
-            PROJ["/ws/{id}/projects — full CRUD"]
+            ADMIN["GET /api/admin/stats"]
+            WS["POST · GET /api/workspaces/"]
+            WSA["GET · extend · reset /api/workspaces/{id}"]
+            TASKS["/api/workspaces/{id}/tasks — full CRUD"]
+            USERS["/api/workspaces/{id}/users — full CRUD"]
+            PROJ["/api/workspaces/{id}/projects — full CRUD"]
         end
 
         R --> DEP["get_workspace · validates id · checks expiry"]
@@ -44,9 +44,9 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    POST["POST /workspaces/"] --> Check["IP limit · global limit"]
+    POST["POST /api/workspaces/"] --> Check["IP limit · global limit"]
     Check -->|ok| Seed["Snapshot seed data · 30 tasks · 10 users · 10 projects"]
-    Check -->|exceeded| Err(["429 · 503"])
+    Check -->|exceeded| Err(["403 · 503"])
     Seed --> WS[("Workspace · UUID · 24h TTL")]
 
     WS --> CRUD["CRUD on tasks · users · projects · isolated per workspace"]
