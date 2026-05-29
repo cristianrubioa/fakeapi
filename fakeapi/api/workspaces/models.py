@@ -9,3 +9,8 @@ class WorkspaceResponseModel(BaseModel):
     expires_at: datetime
     extend_count: int
     plan: str
+
+
+class WorkspaceCountResponseModel(BaseModel):
+    count: int
+    limit: int

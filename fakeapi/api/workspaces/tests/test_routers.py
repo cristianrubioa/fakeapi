@@ -1,10 +1,27 @@
 from unittest.mock import ANY
 
 
-def test_create_workspace(client):
-    # Setup
+def test_get_workspace_count_empty(client):
     # Action
-    response = client.post("/workspaces/")
+    response = client.get("/api/workspaces/count")
+    # Expected
+    expected = {"count": 0, "limit": 3}
+    assert response.status_code == 200
+    assert response.json() == expected
+
+
+def test_get_workspace_count_with_workspace(client, workspace_id):
+    # Action
+    response = client.get("/api/workspaces/count")
+    # Expected
+    expected = {"count": 1, "limit": 3}
+    assert response.status_code == 200
+    assert response.json() == expected
+
+
+def test_create_workspace(client):
+    # Action
+    response = client.post("/api/workspaces/")
     # Expected
     expected = {
         "id": ANY,

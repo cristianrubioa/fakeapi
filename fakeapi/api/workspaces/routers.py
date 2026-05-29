@@ -31,6 +31,14 @@ async def create_workspace(request: Request) -> WorkspaceResponseModel:
     return _to_response(ws)
 
 
+@router.get("/count", response_model=WorkspaceCountResponseModel)
+async def get_workspace_count(request: Request) -> WorkspaceCountResponseModel:
+    client_ip = request.headers.get("CF-Connecting-IP") or request.client.host
+    count = storage.count_by_ip(client_ip)
+    limit = settings.PLANS["free"]["max_workspaces_per_ip"]
+    return WorkspaceCountResponseModel(count=count, limit=limit)
+
+
 @router.get("/{workspace_id}", response_model=WorkspaceResponseModel)
 async def get_workspace(workspace_id: str) -> WorkspaceResponseModel:
     ws = services.get_workspace(workspace_id)
