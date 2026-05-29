@@ -10,6 +10,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FakeAPI — REST API sandbox</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='%230d6efd' d='M40.1 467.1l-11.2 9c-3.2 2.5-7.1 3.9-11.1 3.9C8 480 0 472 0 462.2V192C0 86 86 0 192 0S384 86 384 192V462.2c0 9.8-8 17.8-17.8 17.8c-4 0-7.9-1.4-11.1-3.9l-11.2-9c-3.7-3-8.4-4.6-13.2-4.6c-4.8 0-9.6 1.6-13.3 4.7l-26.8 21.4c-4.2 3.3-9.3 5.1-14.6 5.1c-5.4 0-10.6-1.9-14.7-5.4l-28.1-23.3c-3.7-3.1-8.4-4.7-13.2-4.7c-4.8 0-9.4 1.6-13.1 4.7l-28.1 23.3c-4.1 3.5-9.3 5.4-14.7 5.4c-5.3 0-10.4-1.8-14.6-5.1L75.6 467.3c-3.7-3-8.4-4.6-13.3-4.7c-4.8 0-9.5 1.6-13.2 4.6zM192 192a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm96 48a48 48 0 1 0 0-96 48 48 0 1 0 0 96z'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" />
@@ -126,7 +127,7 @@
       border-radius: 10px;
       overflow: hidden;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: 14px;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
       margin-bottom: 3rem;
     }
@@ -163,23 +164,11 @@
       overflow: hidden;
     }
 
-    .create-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      padding: 0.28rem 0.75rem;
+    .dev-label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.75rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      transition: background 0.2s, opacity 0.2s;
-      white-space: nowrap;
+      color: #8b949e;
     }
-    .create-btn:hover:not(:disabled) { background: var(--accent-hover); }
-    .create-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
     .ws-chip {
       display: none;
@@ -496,9 +485,7 @@
           <span class="dot dot-green"></span>
         </div>
         <div class="bar-center">
-          <button class="create-btn" id="createBtn">
-            <i class="fas fa-play"></i> Create Workspace
-          </button>
+          <span class="dev-label" id="devLabel">dev@fakeapi</span>
           <div class="ws-chip" id="wsChip">
             <span class="ws-id" id="wsIdDisplay"></span>
             <button class="copy-btn" id="copyBtn" aria-label="Copy workspace ID">
@@ -527,8 +514,12 @@
         <div id="tabSection" style="display:none">
           <div id="tabOutput"></div>
         </div>
+        <div id="createHintBar" class="run-hint-bar">
+          <span class="run-hint-text">press &#8629; or click</span>
+          <button class="run-btn" id="createBtn">Create &#9654;</button>
+        </div>
         <div id="runHintBar" class="run-hint-bar" style="display:none">
-          <span class="run-hint-text">press &#8629; or click run</span>
+          <span class="run-hint-text">press &#8629; or click</span>
           <button class="run-btn" id="runBtn">Run &#9654;</button>
         </div>
       </div>
@@ -612,13 +603,15 @@
     // tabState per tab: { response: null|object, newCount: number, firstRun: boolean }
     var workspaces  = [];
     var activeWsIdx = 0;
-    var activeTab   = 'tasks';
-    var wsLimit     = 3;
-    var wsCount     = 0;
-    var tabState    = null;
-    var pendingRun  = false;
+    var activeTab      = 'tasks';
+    var wsLimit        = 3;
+    var wsCount        = 0;
+    var tabState       = null;
+    var pendingRun     = false;
+    var pendingCreate  = true;
 
     var createBtn   = document.getElementById('createBtn');
+    var devLabel    = document.getElementById('devLabel');
     var wsChip      = document.getElementById('wsChip');
     var wsIdDisplay = document.getElementById('wsIdDisplay');
     var copyBtn     = document.getElementById('copyBtn');
@@ -629,6 +622,7 @@
     var termOutput  = document.getElementById('terminalOutput');
     var tabSection  = document.getElementById('tabSection');
     var tabOutput   = document.getElementById('tabOutput');
+    var createHintBar = document.getElementById('createHintBar');
     var runHintBar  = document.getElementById('runHintBar');
     var termBody    = document.querySelector('.terminal-body');
 
@@ -783,14 +777,17 @@
 
     // ── Show Create button again (for "New workspace") ─────────
     function switchToCreate() {
-      createBtn.style.display = '';
-      createBtn.disabled = false;
+      devLabel.style.display = '';
       wsChip.classList.remove('visible');
       tabGroup.classList.remove('visible');
       tabSection.style.display = 'none';
+      runHintBar.style.display = 'none';
       initialCmd.style.display = '';
       termOutput.style.display = '';
       termOutput.innerHTML = '<span class="cursor"></span>';
+      createHintBar.style.display = '';
+      pendingCreate = true;
+      pendingRun = false;
     }
 
     // ── Tab POST demo ──────────────────────────────────────────
@@ -868,7 +865,9 @@
 
     // ── Enter to run ───────────────────────────────────────────
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && pendingRun) runTabCommand(activeTab);
+      if (e.key !== 'Enter') return;
+      if (pendingCreate) doCreate();
+      else if (pendingRun) runTabCommand(activeTab);
     });
 
     // ── Copy workspace ID ──────────────────────────────────────
@@ -883,7 +882,9 @@
 
     // ── Create workspace ───────────────────────────────────────
     async function doCreate() {
-      createBtn.disabled = true;
+      if (!pendingCreate) return;
+      pendingCreate = false;
+      createHintBar.style.display = 'none';
       termOutput.innerHTML = '<div class="response-loading">...</div>';
       termBody.scrollTop = termBody.scrollHeight;
 
@@ -894,7 +895,8 @@
         if (!res.ok) {
           termOutput.innerHTML = '<div class="response-error">  ' + res.status + ' ' + escapeHtml(JSON.stringify(data)) + '</div>';
           termBody.scrollTop = termBody.scrollHeight;
-          createBtn.disabled = false;
+          createHintBar.style.display = '';
+          pendingCreate = true;
           return;
         }
 
@@ -914,7 +916,7 @@
         termOutput.style.display = 'none';
         termOutput.innerHTML = '';
 
-        createBtn.style.display = 'none';
+        devLabel.style.display = 'none';
         wsIdDisplay.textContent = data.id;
         wsChip.classList.add('visible');
         tabGroup.classList.add('visible');
@@ -928,7 +930,8 @@
       } catch (_) {
         termOutput.innerHTML = '<div class="response-error">  error: could not reach {{ base_url }}</div>';
         termBody.scrollTop = termBody.scrollHeight;
-        createBtn.disabled = false;
+        createHintBar.style.display = '';
+        pendingCreate = true;
       }
     }
 
@@ -941,7 +944,9 @@
       wsIdDisplay.textContent = ws.id;
       wsChip.classList.add('visible');
       tabGroup.classList.add('visible');
-      createBtn.style.display = 'none';
+      devLabel.style.display = 'none';
+      createHintBar.style.display = 'none';
+      pendingCreate = false;
       initialCmd.style.display = 'none';
       termOutput.style.display = 'none';
       termOutput.innerHTML = '';
