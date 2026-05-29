@@ -48,4 +48,4 @@ help:
 	@echo "  check        Run format, linting, and tests"
 	@echo "  run          Start uvicorn dev server with auto-reload"
 	@echo "  update       Update all Poetry-managed dependencies"
-	@echo "  smoke        Run smoke tests (requires SMOKE_BASE_URL in .env)"
+	@echo "  smoke        Run smoke tests (requires FakeAPI_BASE_URL in .env)"
