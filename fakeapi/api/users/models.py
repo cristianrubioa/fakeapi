@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from pydantic import EmailStr
 from pydantic import Field
 
-from fakeapi.users.enums import UserRole
+from fakeapi.api.users.enums import UserRole
 
 
 class UserBaseModel(BaseModel):

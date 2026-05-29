@@ -1,8 +1,8 @@
 import copy
 
-from fakeapi.projects.provider import projects_seed
-from fakeapi.tasks.provider import tasks_seed
-from fakeapi.users.provider import users_seed
+from fakeapi.api.projects.provider import projects_seed
+from fakeapi.api.tasks.provider import tasks_seed
+from fakeapi.api.users.provider import users_seed
 
 
 def get_seed_snapshot() -> dict[str, list[dict]]:

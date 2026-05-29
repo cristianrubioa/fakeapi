@@ -4,14 +4,14 @@ from datetime import datetime
 from fastapi import HTTPException
 from fastapi import status
 
+from fakeapi.api.users.exceptions import EmailAlreadyExistsError
+from fakeapi.api.users.exceptions import UserNotFoundError
+from fakeapi.api.users.models import UserCreateModel
+from fakeapi.api.users.models import UserResponseModel
+from fakeapi.api.users.models import UserUpdateModel
 from fakeapi.settings import settings
 from fakeapi.storage import storage
 from fakeapi.storage.base import WorkspaceData
-from fakeapi.users.exceptions import EmailAlreadyExistsError
-from fakeapi.users.exceptions import UserNotFoundError
-from fakeapi.users.models import UserCreateModel
-from fakeapi.users.models import UserResponseModel
-from fakeapi.users.models import UserUpdateModel
 
 
 def _users(workspace: WorkspaceData) -> list[dict]:

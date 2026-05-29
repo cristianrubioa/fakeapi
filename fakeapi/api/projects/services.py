@@ -4,10 +4,10 @@ from datetime import datetime
 from fastapi import HTTPException
 from fastapi import status
 
-from fakeapi.projects.exceptions import ProjectNotFoundError
-from fakeapi.projects.models import ProjectCreateModel
-from fakeapi.projects.models import ProjectResponseModel
-from fakeapi.projects.models import ProjectUpdateModel
+from fakeapi.api.projects.exceptions import ProjectNotFoundError
+from fakeapi.api.projects.models import ProjectCreateModel
+from fakeapi.api.projects.models import ProjectResponseModel
+from fakeapi.api.projects.models import ProjectUpdateModel
 from fakeapi.settings import settings
 from fakeapi.storage import storage
 from fakeapi.storage.base import WorkspaceData

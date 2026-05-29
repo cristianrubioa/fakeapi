@@ -5,17 +5,17 @@ from fastapi import Depends
 from fastapi import Request
 from fastapi import status
 
+from fakeapi.api.projects import services
+from fakeapi.api.projects.models import ProjectCreateModel
+from fakeapi.api.projects.models import ProjectResponseModel
+from fakeapi.api.projects.models import ProjectUpdateModel
+from fakeapi.api.tasks import services as task_services
+from fakeapi.api.workspaces.dependencies import get_workspace
 from fakeapi.common.decorators import filter
 from fakeapi.common.decorators import paginate
 from fakeapi.common.decorators import sort
 from fakeapi.common.pagination import PaginationPreset
-from fakeapi.projects import services
-from fakeapi.projects.models import ProjectCreateModel
-from fakeapi.projects.models import ProjectResponseModel
-from fakeapi.projects.models import ProjectUpdateModel
 from fakeapi.storage.base import WorkspaceData
-from fakeapi.tasks import services as task_services
-from fakeapi.workspaces.dependencies import get_workspace
 
 router = APIRouter()
 

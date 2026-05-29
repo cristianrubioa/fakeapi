@@ -4,13 +4,13 @@ from datetime import datetime
 from fastapi import HTTPException
 from fastapi import status
 
+from fakeapi.api.tasks.exceptions import ResourceNotFound
+from fakeapi.api.tasks.models import TaskCreateModel
+from fakeapi.api.tasks.models import TaskResponseModel
+from fakeapi.api.tasks.models import TaskUpdateModel
 from fakeapi.settings import settings
 from fakeapi.storage import storage
 from fakeapi.storage.base import WorkspaceData
-from fakeapi.tasks.exceptions import ResourceNotFound
-from fakeapi.tasks.models import TaskCreateModel
-from fakeapi.tasks.models import TaskResponseModel
-from fakeapi.tasks.models import TaskUpdateModel
 
 
 def _tasks(workspace: WorkspaceData) -> list[dict]:

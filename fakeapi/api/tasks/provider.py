@@ -5,7 +5,7 @@ from datetime import timedelta
 from faker import Faker
 from faker.providers import BaseProvider
 
-from fakeapi.tasks.enums import TaskStatus
+from fakeapi.api.tasks.enums import TaskStatus
 
 
 class TaskProvider(BaseProvider):

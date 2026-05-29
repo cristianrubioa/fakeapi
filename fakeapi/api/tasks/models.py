@@ -4,8 +4,8 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic import Field
 
+from fakeapi.api.tasks.enums import TaskStatus
 from fakeapi.settings import settings
-from fakeapi.tasks.enums import TaskStatus
 
 
 class TaskBaseModel(BaseModel):

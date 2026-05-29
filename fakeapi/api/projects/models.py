@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic import Field
 
-from fakeapi.projects.enums import ProjectStatus
+from fakeapi.api.projects.enums import ProjectStatus
 
 
 class ProjectBaseModel(BaseModel):

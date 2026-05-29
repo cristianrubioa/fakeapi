@@ -2,10 +2,12 @@ from fastapi import APIRouter
 from fastapi import Request
 from fastapi import status
 
+from fakeapi.api.workspaces import services
+from fakeapi.api.workspaces.models import WorkspaceCountResponseModel
+from fakeapi.api.workspaces.models import WorkspaceResponseModel
 from fakeapi.common.limiter import limiter
 from fakeapi.settings import settings
-from fakeapi.workspaces import services
-from fakeapi.workspaces.models import WorkspaceResponseModel
+from fakeapi.storage import storage
 
 router = APIRouter()
 

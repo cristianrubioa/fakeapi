@@ -9,15 +9,15 @@ from fastapi import status
 from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 
-from fakeapi.admin.routers import router as admin_router
+from fakeapi.api.admin.routers import router as admin_router
+from fakeapi.api.projects.routers import router as projects_router
+from fakeapi.api.tasks.routers import router as tasks_router
+from fakeapi.api.users.routers import router as users_router
+from fakeapi.api.workspaces import services as workspace_services
+from fakeapi.api.workspaces.routers import router as workspaces_router
 from fakeapi.common.limiter import limiter
 from fakeapi.common.middleware import BodySizeLimitMiddleware
 from fakeapi.common.routers import router as common_router
-from fakeapi.projects.routers import router as projects_router
-from fakeapi.tasks.routers import router as tasks_router
-from fakeapi.users.routers import router as users_router
-from fakeapi.workspaces import services as workspace_services
-from fakeapi.workspaces.routers import router as workspaces_router
 
 
 async def _cleanup_loop():
