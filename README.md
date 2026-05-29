@@ -2,7 +2,7 @@
 
 A REST API for testing and prototyping — real in-memory CRUD that persists within an isolated workspace session. No database, no auth.
 
-![FakeAPI](docs/screenshot.png)
+![FakeAPI](docs/assets/preview.png)
 
 ## Stack
 
