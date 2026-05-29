@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <script>
+    (function () {
+      var t = localStorage.getItem('fakeapi-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FakeAPI — REST API sandbox</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <style>
+    /* ── Theme variables ───────────────────────────────────── */
+    :root {
+      --bg:           #ffffff;
+      --surface:      #f6f8fa;
+      --border:       #d0d7de;
+      --text:         #1f2328;
+      --text-muted:   #656d76;
+      --accent:       #0d6efd;
+      --accent-hover: #0b5ed7;
+    }
+    [data-theme="dark"] {
+      --bg:           #0d1117;
+      --surface:      #161b22;
+      --border:       #30363d;
+      --text:         #e6edf3;
+      --text-muted:   #8b949e;
+      --accent:       #4d94ff;
+      --accent-hover: #6ea8fe;
+    }
+
+    /* ── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ── Header ────────────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 64px;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    [data-theme="dark"] header {
+      background: rgba(13, 17, 23, 0.85);
+    }
+    .brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .theme-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      width: 38px;
+      height: 38px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, background 0.2s;
+    }
+    .theme-toggle:hover {
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    /* ── Main ──────────────────────────────────────────────── */
+    main {
+      flex: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 3rem;
+      width: 100%;
+    }
+
+    /* ── Hero ──────────────────────────────────────────────── */
+    .hero {
+      margin-bottom: 2.5rem;
+    }
+    .hero .tagline {
+      font-size: 1.3rem;
+      color: var(--text);
+      font-weight: 400;
+      line-height: 1.5;
+      margin-bottom: 0.4rem;
+    }
+    .hero .sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Terminal ──────────────────────────────────────────── */
+    .terminal {
+      background: #0d1117;
+      border-radius: 10px;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+      margin-bottom: 3rem;
+    }
+
+    /* ── Terminal bar ──────────────────────────────────────── */
+    .terminal-bar {
+      background: #1c2128;
+      padding: 0.6rem 1rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .traffic-lights {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red    { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green  { background: #28c840; }
+
+    .bar-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .create-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 0.28rem 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: background 0.2s, opacity 0.2s;
+      white-space: nowrap;
+    }
+    .create-btn:hover:not(:disabled) { background: var(--accent-hover); }
+    .create-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .ws-chip {
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+      background: #2d333b;
+      border: 1px solid #444c56;
+      border-radius: 5px;
+      padding: 0.2rem 0.5rem;
+      flex-shrink: 0;
+    }
+    .ws-chip.visible { display: flex; }
+
+    .ws-id {
+      color: #79c0ff;
+      font-size: 0.75rem;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #8b949e;
+      font-size: 0.7rem;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover { color: #e6edf3; }
+    .copy-btn.copied { color: #57ab5a; }
+
+    .tab-group {
+      display: none;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .tab-group.visible { display: flex; }
+
+    .tab-btn {
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      color: #8b949e;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.18rem 0.55rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: #e6edf3; border-color: #444c56; }
+    .tab-btn.active {
+      color: #e6edf3;
+      border-color: #4d94ff;
+      background: rgba(77, 148, 255, 0.1);
+    }
+
+    /* ── Workspace counter / switcher ──────────────────────── */
+    .ws-counter-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .ws-counter {
+      background: none;
+      border: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #8b949e;
+      white-space: nowrap;
+      padding: 0.15rem 0.3rem;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+      cursor: default;
+      line-height: 1;
+    }
+    .ws-counter.interactive {
+      cursor: pointer;
+    }
+    .ws-counter.interactive:hover {
+      color: #e6edf3;
+      background: #2d333b;
+    }
+
+    .ws-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: #1c2128;
+      border: 1px solid #444c56;
+      border-radius: 6px;
+      min-width: 220px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      z-index: 50;
+      overflow: hidden;
+    }
+    .ws-dropdown.open { display: block; }
+
+    .ws-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #8b949e;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .ws-dropdown-item:hover { background: #2d333b; color: #e6edf3; }
+    .ws-dropdown-item.active-ws { color: #79c0ff; }
+    .ws-dropdown-item .ws-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #444c56;
+      flex-shrink: 0;
+    }
+    .ws-dropdown-item.active-ws .ws-dot { background: #4d94ff; }
+    .ws-dropdown-item .ws-label {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .ws-dropdown-divider {
+      border: none;
+      border-top: 1px solid #2d333b;
+      margin: 0;
+    }
+    .ws-dropdown-new {
+      color: #57ab5a;
+    }
+    .ws-dropdown-new:hover { color: #7ee383; }
+
+    /* ── Terminal body ─────────────────────────────────────── */
+    .terminal-body {
+      padding: 1.25rem 1.25rem 1.5rem;
+      color: #e6edf3;
+      height: 420px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+    .prompt  { color: #57ab5a; user-select: none; }
+    .cmd     { color: #e6edf3; }
+    .cursor  {
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      background: #e6edf3;
+      vertical-align: text-bottom;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    .cmd-block {
+      margin: 0;
+      font-family: inherit;
+      font-size: inherit;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #e6edf3;
+    }
+
+    .response {
+      margin-top: 0.75rem;
+      color: #79c0ff;
+      white-space: pre;
+    }
+    .response-error { margin-top: 0.75rem; color: #f85149; }
+    .response-loading { margin-top: 0.75rem; color: #8b949e; }
+
+    .run-hint-bar {
+      position: sticky;
+      bottom: 0;
+      background: #0d1117;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      padding: 0.6rem 0 0.25rem;
+    }
+    .run-hint-text {
+      font-size: 0.72rem;
+      color: #444c56;
+    }
+    .run-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 0.25rem 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .run-btn:hover { background: var(--accent-hover); }
+    .ws-resources { margin-top: 0.9rem; font-size: 0.78rem; }
+    .ws-resources .res-row { display: flex; gap: 0.6rem; }
+    .ws-resources .res-name { color: #e6edf3; width: 58px; }
+    .ws-resources .res-sep { color: #444c56; }
+    .ws-resources .res-count { color: #e6edf3; }
+    .ws-resources .res-new { color: #57ab5a; }
+
+    /* ── Info grid ─────────────────────────────────────────── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .info-col h3 {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.65rem;
+    }
+    .info-col ul { list-style: none; }
+    .info-col li {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 0.2rem 0;
+    }
+    .info-col li strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ── Links ─────────────────────────────────────────────── */
+    .links {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .link-btn {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.38rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .link-btn:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.4rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    footer a:hover { color: var(--text); }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 560px) {
+      .info-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .hero .tagline { font-size: 1.1rem; }
+      .ws-id { max-width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <span class="brand">fakeapi</span>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <i id="themeIcon" class="fas fa-moon"></i>
+    </button>
+  </header>
+
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <p class="tagline">A REST API sandbox for testing and prototyping.</p>
+      <p class="sub">No auth. No database. Real CRUD, isolated per workspace.</p>
+    </section>
+
+    <!-- Terminal -->
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="traffic-lights">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <div class="bar-center">
+          <button class="create-btn" id="createBtn">
+            <i class="fas fa-play"></i> Create Workspace
+          </button>
+          <div class="ws-chip" id="wsChip">
+            <span class="ws-id" id="wsIdDisplay"></span>
+            <button class="copy-btn" id="copyBtn" aria-label="Copy workspace ID">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <div class="tab-group" id="tabGroup">
+            <button class="tab-btn active" data-tab="tasks">tasks</button>
+            <button class="tab-btn" data-tab="users">users</button>
+            <button class="tab-btn" data-tab="projects">projects</button>
+          </div>
+        </div>
+        <div class="ws-counter-wrap">
+          <button class="ws-counter" id="wsCounter">0/3</button>
+          <div class="ws-dropdown" id="wsDropdown"></div>
+        </div>
+      </div>
+      <div class="terminal-body">
+        <div id="initialCmd">
+          <span class="prompt">$</span>
+          <span class="cmd"> curl -X POST {{ base_url }}/api/workspaces/</span>
+        </div>
+        <div id="terminalOutput">
+          <span class="cursor"></span>
+        </div>
+        <div id="tabSection" style="display:none">
+          <div id="tabOutput"></div>
+        </div>
+        <div id="runHintBar" class="run-hint-bar" style="display:none">
+          <span class="run-hint-text">press &#8629; or click run</span>
+          <button class="run-btn" id="runBtn">Run &#9654;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info grid -->
+    <div class="info-grid">
+      <div class="info-col">
+        <h3>Resources</h3>
+        <ul>
+          <li><strong>Tasks</strong> · 30 seed</li>
+          <li><strong>Users</strong> · 10 seed</li>
+          <li><strong>Projects</strong> · 10 seed</li>
+        </ul>
+      </div>
+      <div class="info-col">
+        <h3>Endpoints</h3>
+        <ul>
+          <li>/api/workspaces/</li>
+          <li>/api/workspaces/{id}/tasks/</li>
+          <li>/api/workspaces/{id}/users/</li>
+          <li>/api/workspaces/{id}/projects/</li>
+        </ul>
+      </div>
+      <div class="info-col">
+        <h3>Limits</h3>
+        <ul>
+          <li><strong>3</strong> workspaces / IP</li>
+          <li><strong>24h</strong> TTL · extendable</li>
+          <li><strong>60</strong> req / min</li>
+          <li><strong>100</strong> records / resource</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="links">
+      <a class="link-btn" href="/docs">
+        <i class="fas fa-book"></i> Swagger
+      </a>
+      <a class="link-btn" href="https://github.com/cristianrubioa/fakeapi" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i> GitHub
+      </a>
+      <a class="link-btn" href="https://ko-fi.com/cristianrubioa" target="_blank" rel="noopener">
+        <i class="fas fa-mug-hot"></i> Ko-fi
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      Created with <span style="color: #e55;">❤️</span> by
+      <a href="https://github.com/cristianrubioa" target="_blank" rel="noopener">@cristianrubioa</a>
+      for developers
+    </p>
+  </footer>
+
+  <script>
+    // ── Theme ──────────────────────────────────────────────────
+    var root = document.documentElement;
+    var toggleBtn = document.getElementById('themeToggle');
+    var themeIcon = document.getElementById('themeIcon');
+
+    function applyTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    applyTheme(root.getAttribute('data-theme') || 'light');
+
+    toggleBtn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('fakeapi-theme', next);
+      applyTheme(next);
+    });
+
+    // ── Terminal state ─────────────────────────────────────────
+    // workspaces: [{ id, tabState: { tasks, users, projects } }]
+    // tabState per tab: { response: null|object, newCount: number, firstRun: boolean }
+    var workspaces  = [];
+    var activeWsIdx = 0;
+    var activeTab   = 'tasks';
+    var wsLimit     = 3;
+    var wsCount     = 0;
+    var tabState    = null;
+    var pendingRun  = false;
+
+    var createBtn   = document.getElementById('createBtn');
+    var wsChip      = document.getElementById('wsChip');
+    var wsIdDisplay = document.getElementById('wsIdDisplay');
+    var copyBtn     = document.getElementById('copyBtn');
+    var tabGroup    = document.getElementById('tabGroup');
+    var wsCounter   = document.getElementById('wsCounter');
+    var wsDropdown  = document.getElementById('wsDropdown');
+    var initialCmd  = document.getElementById('initialCmd');
+    var termOutput  = document.getElementById('terminalOutput');
+    var tabSection  = document.getElementById('tabSection');
+    var tabOutput   = document.getElementById('tabOutput');
+    var runHintBar  = document.getElementById('runHintBar');
+    var termBody    = document.querySelector('.terminal-body');
+
+    document.getElementById('runBtn').addEventListener('click', function () {
+      if (pendingRun) runTabCommand(activeTab);
+    });
+
+    var TAB_PAYLOADS = {
+      tasks:    { title: 'Fix login timeout', description: 'Session expires too early on mobile', status: 'pending' },
+      users:    { name: 'crubio', email: 'crubio@fakeapi.dev', role: 'member' },
+      projects: { name: 'api-sandbox', description: 'Internal testing ground for fakeapi clients', status: 'active' }
+    };
+
+    var SEED_COUNTS = { tasks: 30, users: 10, projects: 10 };
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function currentWsId() {
+      return workspaces.length > 0 ? workspaces[activeWsIdx].id : null;
+    }
+
+    // ── Render helpers ─────────────────────────────────────────
+    function renderResourceSummary(tab) {
+      var newCount = tabState[tab].newCount;
+      var total = SEED_COUNTS[tab] + newCount;
+      var newHtml = newCount > 0 ? '<span class="res-new"> +' + newCount + ' new</span>' : '';
+      return '<div class="ws-resources"><div class="res-row">' +
+        '<span class="res-name">' + tab + '</span>' +
+        '<span class="res-sep">·</span>' +
+        '<span class="res-count">' + total + newHtml + '</span>' +
+        '</div></div>';
+    }
+
+    function renderTabOutput(tab) {
+      var state = tabState[tab];
+      var wsId = currentWsId();
+      var endpoint = '{{ base_url }}/api/workspaces/' + wsId + '/' + tab + '/';
+      var payload = JSON.stringify(TAB_PAYLOADS[tab]);
+      var cmdBody = ' curl -X POST ' + escapeHtml(endpoint) + ' \\\n     -H "Content-Type: application/json" \\\n     -d \'' + escapeHtml(payload) + '\'';
+      var html = '<pre class="cmd-block"><span class="prompt">$</span><span class="cmd">' + cmdBody + '</span></pre>';
+      if (state.response) {
+        html += '<pre class="response">' + escapeHtml(JSON.stringify(state.response, null, 2)) + '</pre>';
+        html += renderResourceSummary(tab);
+      } else {
+        html += '<div><span class="cursor"></span></div>';
+      }
+      return html;
+    }
+
+    // ── localStorage ───────────────────────────────────────────
+    var STORAGE_KEY = 'fakeapi-state';
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ workspaces: workspaces, activeWsIdx: activeWsIdx }));
+      } catch (_) {}
+    }
+
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        var saved = JSON.parse(raw);
+        if (!saved.workspaces || !saved.workspaces.length) return false;
+        workspaces = saved.workspaces;
+        activeWsIdx = saved.activeWsIdx || 0;
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    // ── Counter ────────────────────────────────────────────────
+    function updateCounter() {
+      var pos = workspaces.length > 0 ? activeWsIdx + 1 : 0;
+      wsCounter.textContent = pos + ' · ' + wsCount + '/' + wsLimit;
+      wsCounter.classList.toggle('interactive', workspaces.length > 0);
+    }
+
+    async function loadCounter() {
+      try {
+        var res = await fetch('{{ base_url }}/api/workspaces/count');
+        if (res.ok) {
+          var data = await res.json();
+          wsLimit = data.limit;
+          wsCount = data.count;
+        }
+      } catch (_) {}
+    }
+
+    // ── Dropdown ───────────────────────────────────────────────
+    function renderDropdown() {
+      var html = '';
+      workspaces.forEach(function (ws, i) {
+        var isActive = i === activeWsIdx;
+        html += '<button class="ws-dropdown-item' + (isActive ? ' active-ws' : '') + '" data-idx="' + i + '">' +
+          '<span class="ws-dot"></span>' +
+          '<span class="ws-label">' + escapeHtml(ws.id) + '</span>' +
+          '</button>';
+      });
+      if (workspaces.length < wsLimit) {
+        html += '<hr class="ws-dropdown-divider">' +
+          '<button class="ws-dropdown-item ws-dropdown-new" data-action="new">' +
+          '<span class="ws-dot" style="background:#57ab5a"></span>' +
+          '<span class="ws-label">New workspace</span>' +
+          '</button>';
+      }
+      wsDropdown.innerHTML = html;
+    }
+
+    function openDropdown() {
+      renderDropdown();
+      wsDropdown.classList.add('open');
+    }
+
+    function closeDropdown() {
+      wsDropdown.classList.remove('open');
+    }
+
+    wsCounter.addEventListener('click', function () {
+      if (!wsCounter.classList.contains('interactive')) return;
+      wsDropdown.classList.contains('open') ? closeDropdown() : openDropdown();
+    });
+
+    wsDropdown.addEventListener('click', function (e) {
+      var item = e.target.closest('.ws-dropdown-item');
+      if (!item) return;
+      closeDropdown();
+      if (item.dataset.action === 'new') {
+        switchToCreate();
+      } else {
+        switchWorkspace(parseInt(item.dataset.idx, 10));
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.ws-counter-wrap')) closeDropdown();
+    });
+
+    // ── Switch workspace ───────────────────────────────────────
+    function switchWorkspace(idx) {
+      activeWsIdx = idx;
+      tabState = workspaces[idx].tabState;
+      wsIdDisplay.textContent = workspaces[idx].id;
+      termOutput.innerHTML = '';
+      updateCounter();
+      saveState();
+      showTabCommand(activeTab);
+    }
+
+    // ── Show Create button again (for "New workspace") ─────────
+    function switchToCreate() {
+      createBtn.style.display = '';
+      createBtn.disabled = false;
+      wsChip.classList.remove('visible');
+      tabGroup.classList.remove('visible');
+      tabSection.style.display = 'none';
+      initialCmd.style.display = '';
+      termOutput.style.display = '';
+      termOutput.innerHTML = '<span class="cursor"></span>';
+    }
+
+    // ── Tab POST demo ──────────────────────────────────────────
+    function showTabCommand(tab) {
+      activeTab = tab;
+      tabGroup.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+      });
+
+      var state = tabState[tab];
+      tabOutput.innerHTML = renderTabOutput(tab);
+
+      if (state.response) {
+        runHintBar.style.display = 'none';
+        pendingRun = false;
+      } else {
+        runHintBar.style.display = state.firstRun ? '' : 'none';
+        pendingRun = true;
+      }
+
+      tabSection.style.display = 'block';
+      termBody.scrollTop = termBody.scrollHeight;
+    }
+
+    async function runTabCommand(tab) {
+      if (!pendingRun) return;
+      pendingRun = false;
+      tabState[tab].firstRun = false;
+      runHintBar.style.display = 'none';
+
+      var cursorEl = tabOutput.querySelector('.cursor');
+      if (cursorEl) cursorEl.parentElement.remove();
+
+      tabOutput.insertAdjacentHTML('beforeend', '<div class="response-loading">...</div>');
+      termBody.scrollTop = termBody.scrollHeight;
+
+      var wsId = currentWsId();
+      var url = '{{ base_url }}/api/workspaces/' + wsId + '/' + tab + '/';
+
+      try {
+        var res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(TAB_PAYLOADS[tab])
+        });
+        var data = await res.json();
+        var loadEl = tabOutput.querySelector('.response-loading');
+        if (loadEl) loadEl.remove();
+        if (!res.ok) {
+          tabOutput.insertAdjacentHTML('beforeend',
+            '<div class="response-error">  ' + res.status + ' ' + escapeHtml(JSON.stringify(data)) + '</div>');
+        } else {
+          tabState[tab].newCount++;
+          tabState[tab].response = data;
+          tabOutput.insertAdjacentHTML('beforeend',
+            '<pre class="response">' + escapeHtml(JSON.stringify(data, null, 2)) + '</pre>' +
+            renderResourceSummary(tab));
+          saveState();
+        }
+      } catch (_) {
+        var loadEl = tabOutput.querySelector('.response-loading');
+        if (loadEl) loadEl.remove();
+        tabOutput.insertAdjacentHTML('beforeend',
+          '<div class="response-error">  error: could not reach {{ base_url }}</div>');
+      }
+
+      termBody.scrollTop = termBody.scrollHeight;
+    }
+
+    // ── Tab clicks ─────────────────────────────────────────────
+    tabGroup.addEventListener('click', function (e) {
+      var btn = e.target.closest('.tab-btn');
+      if (btn && currentWsId()) showTabCommand(btn.dataset.tab);
+    });
+
+    // ── Enter to run ───────────────────────────────────────────
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && pendingRun) runTabCommand(activeTab);
+    });
+
+    // ── Copy workspace ID ──────────────────────────────────────
+    copyBtn.addEventListener('click', function () {
+      var id = currentWsId();
+      if (!id) return;
+      navigator.clipboard.writeText(id).then(function () {
+        copyBtn.classList.add('copied');
+        setTimeout(function () { copyBtn.classList.remove('copied'); }, 1500);
+      });
+    });
+
+    // ── Create workspace ───────────────────────────────────────
+    async function doCreate() {
+      createBtn.disabled = true;
+      termOutput.innerHTML = '<div class="response-loading">...</div>';
+      termBody.scrollTop = termBody.scrollHeight;
+
+      try {
+        var res = await fetch('{{ base_url }}/api/workspaces/', { method: 'POST' });
+        var data = await res.json();
+
+        if (!res.ok) {
+          termOutput.innerHTML = '<div class="response-error">  ' + res.status + ' ' + escapeHtml(JSON.stringify(data)) + '</div>';
+          termBody.scrollTop = termBody.scrollHeight;
+          createBtn.disabled = false;
+          return;
+        }
+
+        var wsEntry = {
+          id: data.id,
+          tabState: {
+            tasks:    { response: null, newCount: 0, firstRun: true },
+            users:    { response: null, newCount: 0, firstRun: true },
+            projects: { response: null, newCount: 0, firstRun: true }
+          }
+        };
+        workspaces.push(wsEntry);
+        activeWsIdx = workspaces.length - 1;
+        tabState = wsEntry.tabState;
+
+        initialCmd.style.display = 'none';
+        termOutput.style.display = 'none';
+        termOutput.innerHTML = '';
+
+        createBtn.style.display = 'none';
+        wsIdDisplay.textContent = data.id;
+        wsChip.classList.add('visible');
+        tabGroup.classList.add('visible');
+
+        wsCount++;
+        updateCounter();
+        saveState();
+
+        showTabCommand('tasks');
+
+      } catch (_) {
+        termOutput.innerHTML = '<div class="response-error">  error: could not reach {{ base_url }}</div>';
+        termBody.scrollTop = termBody.scrollHeight;
+        createBtn.disabled = false;
+      }
+    }
+
+    createBtn.addEventListener('click', doCreate);
+
+    // ── Restore from localStorage ──────────────────────────────
+    function restoreUI() {
+      var ws = workspaces[activeWsIdx];
+      tabState = ws.tabState;
+      wsIdDisplay.textContent = ws.id;
+      wsChip.classList.add('visible');
+      tabGroup.classList.add('visible');
+      createBtn.style.display = 'none';
+      initialCmd.style.display = 'none';
+      termOutput.style.display = 'none';
+      termOutput.innerHTML = '';
+      updateCounter();
+      showTabCommand(activeTab);
+    }
+
+    // ── Init ───────────────────────────────────────────────────
+    async function init() {
+      await loadCounter();
+      if (wsCount === 0) {
+        localStorage.removeItem(STORAGE_KEY);
+        updateCounter();
+      } else if (loadState()) {
+        restoreUI();
+      } else {
+        updateCounter();
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

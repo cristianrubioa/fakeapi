@@ -12,6 +12,8 @@ class Settings(BaseSettings):
 
     STORAGE_BACKEND: StorageBackend = StorageBackend.MEMORY
 
+    BASE_URL: str = "http://localhost:8000"
+
     PLANS: dict[str, dict[str, Any]] = {
         "free": {
             "max_records_per_resource": 100,
