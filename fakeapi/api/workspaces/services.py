@@ -27,7 +27,7 @@ def create_workspace(client_ip: str) -> WorkspaceData:
 
     if storage.count_by_ip(client_ip) >= plan["max_workspaces_per_ip"]:
         raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Workspace limit per IP reached.",
         )
 
