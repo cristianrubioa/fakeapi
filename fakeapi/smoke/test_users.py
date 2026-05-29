@@ -5,7 +5,7 @@ import httpx
 
 def test_list_users(base_url, workspace_id):
     # Action
-    response = httpx.get(f"{base_url}/ws/{workspace_id}/users/")
+    response = httpx.get(f"{base_url}/api/workspaces/{workspace_id}/users/")
     # Expected
     expected = {"count": 10, "next": None, "previous": None, "results": ANY}
     assert response.status_code == 200
@@ -14,7 +14,7 @@ def test_list_users(base_url, workspace_id):
 
 def test_filter_users_by_role(base_url, workspace_id):
     # Action
-    response = httpx.get(f"{base_url}/ws/{workspace_id}/users/?role=admin")
+    response = httpx.get(f"{base_url}/api/workspaces/{workspace_id}/users/?role=admin")
     # Expected
     data = response.json()
     assert response.status_code == 200
@@ -23,7 +23,7 @@ def test_filter_users_by_role(base_url, workspace_id):
 
 def test_get_user_by_id(base_url, workspace_id):
     # Action
-    response = httpx.get(f"{base_url}/ws/{workspace_id}/users/1")
+    response = httpx.get(f"{base_url}/api/workspaces/{workspace_id}/users/1")
     # Expected
     expected = {
         "id": 1,
@@ -38,7 +38,7 @@ def test_get_user_by_id(base_url, workspace_id):
 
 def test_get_user_not_found(base_url, workspace_id):
     # Action
-    response = httpx.get(f"{base_url}/ws/{workspace_id}/users/999999")
+    response = httpx.get(f"{base_url}/api/workspaces/{workspace_id}/users/999999")
     # Expected
     expected = {"detail": "User not found."}
     assert response.status_code == 404
@@ -49,7 +49,7 @@ def test_create_user(base_url, workspace_id):
     # Setup
     payload = {"name": "Smoke Tester", "email": "smoke@example.com", "role": "member"}
     # Action
-    response = httpx.post(f"{base_url}/ws/{workspace_id}/users/", json=payload)
+    response = httpx.post(f"{base_url}/api/workspaces/{workspace_id}/users/", json=payload)
     # Expected
     expected = {
         "id": ANY,
@@ -65,12 +65,12 @@ def test_create_user(base_url, workspace_id):
 def test_delete_user(base_url, workspace_id):
     # Setup
     created = httpx.post(
-        f"{base_url}/ws/{workspace_id}/users/",
+        f"{base_url}/api/workspaces/{workspace_id}/users/",
         json={"name": "Delete Target", "email": "delete@example.com", "role": "viewer"},
     ).json()
     user_id = created["id"]
     # Action
-    response = httpx.delete(f"{base_url}/ws/{workspace_id}/users/{user_id}")
+    response = httpx.delete(f"{base_url}/api/workspaces/{workspace_id}/users/{user_id}")
     # Expected
     assert response.status_code == 204
     assert response.content == b""
