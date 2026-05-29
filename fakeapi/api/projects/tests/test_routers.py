@@ -4,7 +4,7 @@ from unittest.mock import ANY
 def test_list_projects(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/projects/")
+    response = client.get(f"/api/workspaces/{workspace_id}/projects/")
     # Expected
     expected = {
         "count": 10,
@@ -19,7 +19,7 @@ def test_list_projects(client, workspace_id):
 def test_get_project_by_id(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/projects/1")
+    response = client.get(f"/api/workspaces/{workspace_id}/projects/1")
     # Expected
     expected = {
         "id": 1,
@@ -35,7 +35,7 @@ def test_get_project_by_id(client, workspace_id):
 def test_get_project_not_found(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/projects/999999")
+    response = client.get(f"/api/workspaces/{workspace_id}/projects/999999")
     # Expected
     expected = {"detail": "Project not found."}
     assert response.status_code == 404
@@ -50,7 +50,7 @@ def test_create_project(client, workspace_id):
         "status": "active",
     }
     # Action
-    response = client.post(f"/ws/{workspace_id}/projects/", json=payload)
+    response = client.post(f"/api/workspaces/{workspace_id}/projects/", json=payload)
     # Expected
     expected = {
         "id": ANY,
@@ -66,13 +66,13 @@ def test_create_project(client, workspace_id):
 def test_patch_project(client, workspace_id):
     # Setup
     created = client.post(
-        f"/ws/{workspace_id}/projects/",
+        f"/api/workspaces/{workspace_id}/projects/",
         json={"name": "Patch Target", "description": "Original description", "status": "active"},
     ).json()
     project_id = created["id"]
     payload = {"name": "Patched Name"}
     # Action
-    response = client.patch(f"/ws/{workspace_id}/projects/{project_id}", json=payload)
+    response = client.patch(f"/api/workspaces/{workspace_id}/projects/{project_id}", json=payload)
     # Expected
     expected = {
         "id": project_id,
@@ -88,7 +88,7 @@ def test_patch_project(client, workspace_id):
 def test_put_project(client, workspace_id):
     # Setup
     created = client.post(
-        f"/ws/{workspace_id}/projects/",
+        f"/api/workspaces/{workspace_id}/projects/",
         json={"name": "Put Target", "description": "Original description", "status": "active"},
     ).json()
     project_id = created["id"]
@@ -98,7 +98,7 @@ def test_put_project(client, workspace_id):
         "status": "on_hold",
     }
     # Action
-    response = client.put(f"/ws/{workspace_id}/projects/{project_id}", json=payload)
+    response = client.put(f"/api/workspaces/{workspace_id}/projects/{project_id}", json=payload)
     # Expected
     expected = {
         "id": project_id,
@@ -114,12 +114,12 @@ def test_put_project(client, workspace_id):
 def test_delete_project(client, workspace_id):
     # Setup
     created = client.post(
-        f"/ws/{workspace_id}/projects/",
+        f"/api/workspaces/{workspace_id}/projects/",
         json={"name": "Delete Target", "description": "To be deleted", "status": "active"},
     ).json()
     project_id = created["id"]
     # Action
-    response = client.delete(f"/ws/{workspace_id}/projects/{project_id}")
+    response = client.delete(f"/api/workspaces/{workspace_id}/projects/{project_id}")
     # Expected
     assert response.status_code == 204
     assert response.content == b""

@@ -51,8 +51,8 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 app.add_middleware(BodySizeLimitMiddleware)
 
 app.include_router(common_router)
-app.include_router(admin_router)
-app.include_router(workspaces_router, prefix="/workspaces", tags=["Workspaces"])
-app.include_router(tasks_router, prefix="/ws/{workspace_id}/tasks", tags=["Tasks"])
-app.include_router(users_router, prefix="/ws/{workspace_id}/users", tags=["Users"])
-app.include_router(projects_router, prefix="/ws/{workspace_id}/projects", tags=["Projects"])
+app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
+app.include_router(workspaces_router, prefix="/api/workspaces", tags=["Workspaces"])
+app.include_router(tasks_router, prefix="/api/workspaces/{workspace_id}/tasks", tags=["Tasks"])
+app.include_router(users_router, prefix="/api/workspaces/{workspace_id}/users", tags=["Users"])
+app.include_router(projects_router, prefix="/api/workspaces/{workspace_id}/projects", tags=["Projects"])

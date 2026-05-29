@@ -4,7 +4,7 @@ from unittest.mock import ANY
 def test_list_users(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/users/")
+    response = client.get(f"/api/workspaces/{workspace_id}/users/")
     # Expected
     expected = {
         "count": 10,
@@ -19,7 +19,7 @@ def test_list_users(client, workspace_id):
 def test_get_user_by_id(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/users/1")
+    response = client.get(f"/api/workspaces/{workspace_id}/users/1")
     # Expected
     expected = {
         "id": 1,
@@ -35,7 +35,7 @@ def test_get_user_by_id(client, workspace_id):
 def test_get_user_not_found(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/users/999999")
+    response = client.get(f"/api/workspaces/{workspace_id}/users/999999")
     # Expected
     expected = {"detail": "User not found."}
     assert response.status_code == 404
@@ -50,7 +50,7 @@ def test_create_user(client, workspace_id):
         "role": "member",
     }
     # Action
-    response = client.post(f"/ws/{workspace_id}/users/", json=payload)
+    response = client.post(f"/api/workspaces/{workspace_id}/users/", json=payload)
     # Expected
     expected = {
         "id": ANY,
@@ -71,7 +71,7 @@ def test_create_user_duplicate_email(client, workspace_id):
         "role": "member",
     }
     # Action
-    response = client.post(f"/ws/{workspace_id}/users/", json=payload)
+    response = client.post(f"/api/workspaces/{workspace_id}/users/", json=payload)
     # Expected
     expected = {"detail": "Email already exists in this workspace."}
     assert response.status_code == 409
@@ -81,13 +81,13 @@ def test_create_user_duplicate_email(client, workspace_id):
 def test_patch_user(client, workspace_id):
     # Setup
     created = client.post(
-        f"/ws/{workspace_id}/users/",
+        f"/api/workspaces/{workspace_id}/users/",
         json={"name": "Patch Target", "email": "patch.target@example.com", "role": "member"},
     ).json()
     user_id = created["id"]
     payload = {"name": "Patched Name", "role": "viewer"}
     # Action
-    response = client.patch(f"/ws/{workspace_id}/users/{user_id}", json=payload)
+    response = client.patch(f"/api/workspaces/{workspace_id}/users/{user_id}", json=payload)
     # Expected
     expected = {
         "id": user_id,
@@ -103,12 +103,12 @@ def test_patch_user(client, workspace_id):
 def test_delete_user(client, workspace_id):
     # Setup
     created = client.post(
-        f"/ws/{workspace_id}/users/",
+        f"/api/workspaces/{workspace_id}/users/",
         json={"name": "Delete Target", "email": "delete.target@example.com", "role": "member"},
     ).json()
     user_id = created["id"]
     # Action
-    response = client.delete(f"/ws/{workspace_id}/users/{user_id}")
+    response = client.delete(f"/api/workspaces/{workspace_id}/users/{user_id}")
     # Expected
     assert response.status_code == 204
     assert response.content == b""

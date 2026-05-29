@@ -4,7 +4,7 @@ from unittest.mock import ANY
 def test_list_tasks(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/tasks/")
+    response = client.get(f"/api/workspaces/{workspace_id}/tasks/")
     # Expected
     expected = {
         "count": 30,
@@ -19,7 +19,7 @@ def test_list_tasks(client, workspace_id):
 def test_get_task_by_id(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/tasks/1")
+    response = client.get(f"/api/workspaces/{workspace_id}/tasks/1")
     # Expected
     expected = {
         "id": 1,
@@ -37,7 +37,7 @@ def test_get_task_by_id(client, workspace_id):
 def test_get_task_not_found(client, workspace_id):
     # Setup
     # Action
-    response = client.get(f"/ws/{workspace_id}/tasks/999999")
+    response = client.get(f"/api/workspaces/{workspace_id}/tasks/999999")
     # Expected
     expected = {"detail": "Resource not found."}
     assert response.status_code == 404
@@ -54,7 +54,7 @@ def test_create_task(client, workspace_id):
         "project_id": None,
     }
     # Action
-    response = client.post(f"/ws/{workspace_id}/tasks/", json=payload)
+    response = client.post(f"/api/workspaces/{workspace_id}/tasks/", json=payload)
     # Expected
     expected = {
         "id": ANY,
@@ -72,13 +72,13 @@ def test_create_task(client, workspace_id):
 def test_patch_task(client, workspace_id):
     # Setup
     created = client.post(
-        f"/ws/{workspace_id}/tasks/",
+        f"/api/workspaces/{workspace_id}/tasks/",
         json={"title": "Patch Target Task", "description": "Original description", "status": "pending"},
     ).json()
     task_id = created["id"]
     payload = {"title": "Patched Task Title", "status": "in_progress"}
     # Action
-    response = client.patch(f"/ws/{workspace_id}/tasks/{task_id}", json=payload)
+    response = client.patch(f"/api/workspaces/{workspace_id}/tasks/{task_id}", json=payload)
     # Expected
     expected = {
         "id": task_id,
@@ -96,12 +96,12 @@ def test_patch_task(client, workspace_id):
 def test_delete_task(client, workspace_id):
     # Setup
     created = client.post(
-        f"/ws/{workspace_id}/tasks/",
+        f"/api/workspaces/{workspace_id}/tasks/",
         json={"title": "Delete Target Task", "description": "To be deleted", "status": "pending"},
     ).json()
     task_id = created["id"]
     # Action
-    response = client.delete(f"/ws/{workspace_id}/tasks/{task_id}")
+    response = client.delete(f"/api/workspaces/{workspace_id}/tasks/{task_id}")
     # Expected
     assert response.status_code == 204
     assert response.content == b""

@@ -9,7 +9,7 @@ from fakeapi.storage import storage
 router = APIRouter()
 
 
-@router.get("/admin/stats", tags=["Admin"])
+@router.get("/stats")
 async def admin_stats(request: Request):
     return {
         "active_workspaces": storage.total_count(),

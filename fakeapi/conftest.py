@@ -18,5 +18,5 @@ def clean_storage():
 
 @pytest.fixture(scope="module")
 def workspace_id(client):
-    response = client.post("/workspaces/")
+    response = client.post("/api/workspaces/")
     return response.json()["id"]

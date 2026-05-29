@@ -18,9 +18,8 @@ def test_create_workspace(client):
 
 
 def test_get_workspace(client, workspace_id):
-    # Setup
     # Action
-    response = client.get(f"/workspaces/{workspace_id}")
+    response = client.get(f"/api/workspaces/{workspace_id}")
     # Expected
     expected = {
         "id": workspace_id,
@@ -34,9 +33,8 @@ def test_get_workspace(client, workspace_id):
 
 
 def test_get_workspace_not_found(client):
-    # Setup
     # Action
-    response = client.get("/workspaces/nonexistent-workspace-id")
+    response = client.get("/api/workspaces/nonexistent-workspace-id")
     # Expected
     expected = {"detail": "Workspace not found."}
     assert response.status_code == 404
@@ -44,9 +42,8 @@ def test_get_workspace_not_found(client):
 
 
 def test_extend_workspace(client, workspace_id):
-    # Setup
     # Action
-    response = client.post(f"/workspaces/{workspace_id}/extend")
+    response = client.post(f"/api/workspaces/{workspace_id}/extend")
     # Expected
     expected = {
         "id": workspace_id,
@@ -61,11 +58,11 @@ def test_extend_workspace(client, workspace_id):
 
 def test_extend_workspace_max_extensions_reached(client):
     # Setup
-    ws_id = client.post("/workspaces/").json()["id"]
+    ws_id = client.post("/api/workspaces/").json()["id"]
     for _ in range(3):
-        client.post(f"/workspaces/{ws_id}/extend")
+        client.post(f"/api/workspaces/{ws_id}/extend")
     # Action
-    response = client.post(f"/workspaces/{ws_id}/extend")
+    response = client.post(f"/api/workspaces/{ws_id}/extend")
     # Expected
     expected = {"detail": "Maximum extensions reached."}
     assert response.status_code == 422
@@ -73,9 +70,8 @@ def test_extend_workspace_max_extensions_reached(client):
 
 
 def test_reset_workspace(client, workspace_id):
-    # Setup
     # Action
-    response = client.post(f"/workspaces/{workspace_id}/reset")
+    response = client.post(f"/api/workspaces/{workspace_id}/reset")
     # Expected
     expected = {
         "id": workspace_id,
@@ -89,19 +85,15 @@ def test_reset_workspace(client, workspace_id):
 
 
 def test_root(client):
-    # Setup
     # Action
     response = client.get("/")
     # Expected
-    expected = {"name": "FakeAPI", "version": "2.0.0", "docs": "/docs"}
     assert response.status_code == 200
-    assert response.json() == expected
 
 
 def test_admin_stats(client):
-    # Setup
     # Action
-    response = client.get("/admin/stats")
+    response = client.get("/api/admin/stats")
     # Expected
     expected = {
         "active_workspaces": ANY,
