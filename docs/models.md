@@ -64,13 +64,6 @@ flowchart TD
 
 ### TaskStatus
 
-```mermaid
-flowchart LR
-    P["pending"] --> IP["in_progress"]
-    IP --> C["completed"]
-    IP --> X["canceled"]
-```
-
 | Value | Meaning |
 |---|---|
 | `pending` | Not yet started |
